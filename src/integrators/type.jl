@@ -26,7 +26,7 @@ end
 mutable struct SDDEIntegrator{algType, IIP, uType, uEltype, tType, P, eigenType,
                               tTypeNoUnits, uEltypeNoUnits, randType, randType2, rateType,
                               solType, cacheType, F, G, F6, OType, noiseType,
-                              EventErrorType, CallbackCacheType, H, IType} <:
+                              EventErrorType, CallbackCacheType, H, IType, IA} <:
                AbstractSDDEIntegrator{algType, IIP, uType, tType}
     f::F
     g::G
@@ -79,8 +79,9 @@ mutable struct SDDEIntegrator{algType, IIP, uType, uEltype, tType, P, eigenType,
     qold::tTypeNoUnits
     q11::tTypeNoUnits
     history::H
-    destats::DiffEqBase.DEStats
+    stats::DiffEqBase.Stats
     integrator::IType # history integrator
+    initializealg::IA
 end
 
 function (integrator::SDDEIntegrator)(t, deriv::Type = Val{0}; idxs = nothing)

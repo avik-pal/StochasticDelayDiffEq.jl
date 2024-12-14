@@ -34,7 +34,7 @@ function has_dependent_lags(prob::SDDEProblem)
 end
 
 function u_uprev(u0; alias_u0 = false)
-    if typeof(u0) <: Tuple
+    if u0 isa Tuple
         u = ArrayPartition(prob.u0, Val{true})
     else
         if alias_u0
@@ -186,13 +186,13 @@ function build_history_function(prob, alg, reltol, rate_prototype, noise_rate_pr
     if typeof(getalg(alg)) <: StochasticDiffEq.StochasticDiffEqCompositeAlgorithm
         alg_choice = Int[]
         sde_sol = DiffEqBase.build_solution(prob, alg, sde_ts, sde_timeseries, W = W,
-                                            destats = DiffEqBase.DEStats(0),
+                                            stats = DiffEqBase.Stats(0),
                                             calculate_error = false,
                                             alg_choice = alg_choice,
                                             interp = id, dense = dense, seed = _seed)
     else
         sde_sol = DiffEqBase.build_solution(prob, alg, sde_ts, sde_timeseries, W = W,
-                                            destats = DiffEqBase.DEStats(0),
+                                            stats = DiffEqBase.Stats(0),
                                             calculate_error = false,
                                             interp = id, dense = dense, seed = _seed)
     end
@@ -247,10 +247,10 @@ end
 
 function unwrap_alg(integrator::SDDEIntegrator, is_stiff)
     alg = integrator.alg
-    iscomp = typeof(alg) <: StochasticDiffEq.StochasticCompositeAlgorithm
+    iscomp = alg isa StochasticDiffEq.StochasticCompositeAlgorithm
     if !iscomp
         return alg
-    elseif typeof(alg.choice_function) <: DiffEqBase.AutoSwitch
+    elseif alg.choice_function isa DiffEqBase.AutoSwitch
         num = is_stiff ? 2 : 1
         return alg.algs[num]
     else
